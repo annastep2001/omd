@@ -1,6 +1,24 @@
 import csv
 
 
+def read_file(name: str) -> list:
+    """
+    Считывает данные из файла name в список словарей file_list
+    Входные параметры
+    -----------------------
+    name: str - название файла, из которого считываем
+    Возвращаемое значение
+    -----------------------
+    file: list - список словарей, считанный из файла
+    """
+    file = []
+    with open(name) as csv_file:
+        file_reader = csv.DictReader(csv_file, delimiter=';')
+        for row in file_reader:
+            file.append(row)
+    return file
+
+
 def csv_fork(fork: dict, path: str):
     """
     Записывает данные о вилке зарплат в файл
@@ -32,7 +50,6 @@ def print_fork(fork: dict):
     fork: dict - данные о вилке зарплат
     """
 
-    end = ''
     end1 = 'a'
     end2 = 'ов'
     for dep, val in fork.items():
@@ -65,32 +82,32 @@ def print_departments(departments: dict):
             print(f'  - {c}')
 
 
-def department_hierarchy() -> dict:
+def department_hierarchy(file: list) -> dict:
     """
     Составление иерархии департамента
+    Входные параметры
+    ---------------------
+    file: list - файл в виде списка словарей
     Возвращаемое значение
     ---------------------
      - departments: dict
         {'департамент': {'отдел_1', 'отдел_2', ...}}
     """
-
     departments = {}
-    with open("Corp Summary.csv") as r_file:
-        file_reader = csv.reader(r_file, delimiter=";")
-        count = 0
-        for row in file_reader:
-            if count != 0:
-                if row[1] not in departments:
-                    departments[row[1]] = set()
-                departments[row[1]].add(row[2])
-            count += 1
+    for row in file:
+        if row['Департамент'] not in departments:
+            departments.setdefault(row['Департамент'], set())
+        departments[row['Департамент']].add(row['Отдел'])
 
     return departments
 
 
-def salary_fork() -> dict:
+def salary_fork(file: list) -> dict:
     """
     Составление вилки зарплат для департаментов
+     Входные параметры
+    ---------------------
+    file: list - файл в виде списка словарей
     Возвращаемое значение
     ---------------------
      - fork: dict
@@ -98,30 +115,28 @@ def salary_fork() -> dict:
     """
 
     fork = {}
-    with open("Corp Summary.csv") as r_file:
-        file_reader = csv.reader(r_file, delimiter=";")
-        count = 0
-        for row in file_reader:
-            if count != 0:
-                if row[1] not in fork:
-                    fork[row[1]] = []
-                    fork[row[1]].append(0)
-                    fork[row[1]].append(int(row[5]))
-                    fork[row[1]].append(int(row[5]))
-                    fork[row[1]].append(0)
-                fork[row[1]][0] += 1
-                fork[row[1]][1] = min(fork[row[1]][1], int(row[5]))
-                fork[row[1]][2] = max(fork[row[1]][2], int(row[5]))
-                fork[row[1]][3] += int(row[5])
-            count += 1
 
-        for key, value in fork.items():
-            value[3] /= value[0]
+    for row in file:
+        department = row['Департамент']
+        salary = row['Оклад']
+        if department not in fork:
+            fork.setdefault(department, list())
+            fork[department].append(0)
+            fork[department].append(int(salary))
+            fork[department].append(int(salary))
+            fork[department].append(0)
+        fork[department][0] += 1
+        fork[department][1] = min(fork[department][1], int(salary))
+        fork[department][2] = max(fork[department][2], int(salary))
+        fork[department][3] += int(salary)
+
+    for key, value in fork.items():
+        value[3] /= value[0]
 
     return fork
 
 
-def user():
+def menu():
     """
     Взаимодействие с пользователем
     """
@@ -131,24 +146,32 @@ def user():
         '2. Вывод сводного отчёта по департаментам: название, численность, "вилка" зарплат: мин, макс, средняя зарплата')
     print('3. Сохранение сводного отчёта в виде csv-файла')
     print('4. Выход')
-    com = int(input())
-    while (com != 4):
-        if com == 1:
-            print_departments(department_hierarchy())
-        if com == 2:
-            print_fork(salary_fork())
-        if com == 3:
+    com = input()
+    while com != '4':
+        if com == '1':
+            file = read_file('Corp Summary.csv')
+            hierarchy = department_hierarchy(file)
+            print_departments(hierarchy)
+        elif com == '2':
+            file = read_file('Corp Summary.csv')
+            salfork = salary_fork(file)
+            print_fork(salfork)
+        elif com == '3':
             print('Введите путь к файлу, в который хотите сохранить отчет')
             path = input()
-            csv_fork(salary_fork(), path)
-        if com == 4:
+            file = read_file('Corp Summary.csv')
+            salfork = salary_fork(file)
+            csv_fork(salfork, path)
+        elif com == '4':
             break
+        else:
+            print('Ошибка! Введите число от 1 до 4')
 
         print('\nВведите следующую команду\n')
-        com = int(input())
+        com = input()
 
     print('Работа закончена')
 
 
 if __name__ == '__main__':
-    user()
+    menu()
