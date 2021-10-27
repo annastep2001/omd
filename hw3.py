@@ -1,4 +1,8 @@
 class CountVectorizer():
+    def __init__(self):
+        self.count_matrix = []
+        self.feature_names = []
+
     def fit_transform(self, raw_documents: list):
         feature_names = set()
         count_matrix = []
@@ -16,6 +20,7 @@ class CountVectorizer():
                 ind = word_dict[word]
                 cur_line[ind] += 1
             count_matrix.append(cur_line)
+        self.count_matrix = count_matrix
         return count_matrix
 
     def get_feature_names(self):
