@@ -5,7 +5,7 @@ class CountVectorizer():
     def __init__(self):
         self.feature_names = []
 
-    def fit(self, raw_documents):
+    def fit(self, raw_documents: list):
         feature_names = set()
         count_matrix = []
         for line in raw_documents:
@@ -14,7 +14,7 @@ class CountVectorizer():
 
         self.feature_names = sorted(list(feature_names))
 
-    def transform(self, raw_documents):
+    def transform(self, raw_documents: list) -> list:
         count_matrix = []
         all_words = dict.fromkeys(self.feature_names, 0)
         for line in raw_documents:
@@ -24,11 +24,11 @@ class CountVectorizer():
             count_matrix.append(list(cur.values()))
         return count_matrix
 
-    def fit_transform(self, raw_documents: list):
+    def fit_transform(self, raw_documents: list) -> list:
         self.fit(raw_documents)
         return self.transform(raw_documents)
 
-    def get_feature_names(self):
+    def get_feature_names(self) -> list:
         return self.feature_names
 
 
