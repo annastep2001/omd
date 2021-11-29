@@ -59,6 +59,10 @@ class TestTF(unittest.TestCase):
         actual = fit_transform(list())
         self.assertIsNotNone(actual)
 
+    def test_exc(self):
+        with self.assertRaises(TypeError):
+            fit_transform()
+
 
 if __name__ == '__main__':
     unittest.main()

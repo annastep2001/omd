@@ -1,6 +1,8 @@
 from issue4 import fit_transform
 
 
+# import pytest
+
 def test_eq():
     cities = ['Moscow', 'New York', 'Moscow', 'London']
     actual = fit_transform(cities)
@@ -37,3 +39,7 @@ def test_animals():
 def test_nan():
     actual = fit_transform(list())
     assert actual is not None
+
+# def test_exc():
+#     with pytest.raises(TypeError):
+#         fit_transform()
