@@ -58,11 +58,16 @@ def decode(morse_message: str) -> str:
 
 @pytest.mark.parametrize('s,exp', [
     ('... --- ...', 'SOS'),
-    ('-.-. .- -', 'CAT'),
-    (123, "AttributeError: 'int' object has no attribute 'split'")
+    ('-.-. .- -', 'CAT')
 ])
 def test_decode(s, exp):
     assert decode(s) == exp
+
+
+@pytest.mark.parametrize('s', [123])
+def test_exc(s):
+    with pytest.raises(AttributeError):
+        decode(123)
 
 
 if __name__ == '__main__':
