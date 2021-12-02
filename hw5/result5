@@ -1,0 +1,7 @@
+C:\Users\Анна\Desktop\p\5>coverage report
+Name        Stmts   Miss  Cover
+-------------------------------
+issue5.py      19      0   100%
+test_5.py      23      0   100%
+-------------------------------
+TOTAL          42      0   100%
